@@ -1,0 +1,6 @@
+.auto.tfvars
+.terraform/
+*.tfstate
+*.tfstate.backup
+
+id_rsa*
