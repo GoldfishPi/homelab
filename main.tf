@@ -5,6 +5,10 @@ module "infrastructure" {
   }
 }
 
-output "instance_ip_address" {
-  value = module.infrastructure.instance_ip_address
+output "test" {
+  value = module.infrastructure.test_debian_ipv4
+}
+
+output "postgres" {
+  value = module.infrastructure.postgres_ipv4
 }
