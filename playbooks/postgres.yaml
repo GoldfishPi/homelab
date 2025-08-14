@@ -1,0 +1,81 @@
+- name: Postgresql
+  hosts: all
+  become: yes
+  tasks:
+
+    - name: Install deps
+      apt:
+        name:
+          - postgresql
+          - acl
+          - python3-psycopg2
+
+    - name: Enable listening
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        line: "listen_addresses = '*'"
+        insertafter: EOF
+
+    - name: Allow password auth
+      replace:
+        path: /etc/postgresql/15/main/pg_hba.conf
+        regexp: '^(host\s+\S+\s+\S+\s+\S+\s+)ident'
+        replace: '\1md5'
+
+    - name: Enable trust
+      replace:
+        path: /etc/postgresql/15/main/pg_hba.conf
+        regexp: '^(local\s+\S+\s+\S+\s+)peer'
+        replace: '\1trust'
+
+    - name: Enable all local network trafic
+      blockinfile:
+        path: /etc/postgresql/15/main/pg_hba.conf
+        block: |
+          host      all      all      0.0.0.0/0             md5
+          host      all      all      192.168.200.0/24      md5
+        insertafter: EOF
+
+    - name: Start postgresql service
+      service:
+        name: postgresql
+        state: started
+
+    - name: Create user
+      become_user: postgres
+      become_flags: "-s"
+      postgresql_user:
+        name: admin
+        password: "password"
+        state: present
+
+    - name: Ensure database 'public' exists
+      become_user: postgres
+      postgresql_db:
+        name: test
+        state: present
+
+    - name: Grant all privileges on database public to admin
+      become: yes
+      become_user: postgres
+      become_flags: "-s"
+      community.postgresql.postgresql_privs:
+        database: test
+        roles: admin
+        type: database
+        privs: ALL
+
+    - name: Grant all privileges on schema public to admin
+      become: yes
+      become_user: postgres
+      community.postgresql.postgresql_privs:
+        database: test
+        roles: admin
+        type: schema
+        objs: public
+        privs: ALL
+
+    - name: Restart service
+      service:
+        name: postgresql
+        state: restarted
