@@ -60,7 +60,7 @@
       become_user: postgres
       become_flags: "-s"
       community.postgresql.postgresql_privs:
-        database: test
+        login_db: test
         roles: admin
         type: database
         privs: ALL
@@ -69,7 +69,7 @@
       become: yes
       become_user: postgres
       community.postgresql.postgresql_privs:
-        database: test
+        login_db: test
         roles: admin
         type: schema
         objs: public
