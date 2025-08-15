@@ -94,6 +94,9 @@ resource "proxmox_virtual_environment_vm" "postgres" {
   serial_device {
     device = "socket"
   }
+  provisioner "local-exec" {
+    command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '${self.ipv4_addresses[1][0]},' playbooks/postgres.yaml"
+  }
 }
 
 output "test_debian_ipv4" {
