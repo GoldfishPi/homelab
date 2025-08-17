@@ -1,5 +1,6 @@
-resource "proxmox_virtual_environment_vm" "postgres" {
-  name      = "postgres"
+
+resource "proxmox_virtual_environment_vm" "nginx_proxy_manager" {
+  name      = "nginx-proxy-manager"
   node_name = "node1"
 
   # should be true if qemu agent is not installed / enabled on the VM
@@ -10,7 +11,7 @@ resource "proxmox_virtual_environment_vm" "postgres" {
   }
 
   memory {
-    dedicated = 2048
+    dedicated = 4096
   }
 
   operating_system {
@@ -45,21 +46,7 @@ resource "proxmox_virtual_environment_vm" "postgres" {
   serial_device {
     device = "socket"
   }
-  provisioner "local-exec" {
-    command = "ansible-playbook -i '${self.ipv4_addresses[1][0]},' playbooks/postgres.yaml"
-  }
-}
-
-resource "pihole_dns_record" "pg" {
-  domain = "pg.local"
-  ip     = proxmox_virtual_environment_vm.postgres.ipv4_addresses[1][0]
-}
-
-
-output "postgres_ipv4" {
-  value = proxmox_virtual_environment_vm.postgres.ipv4_addresses[1][0]
-}
-
-output "postgres_local" {
-  value = pihole_dns_record.pg.domain
+  # provisioner "local-exec" {
+  #   command = "ansible-playbook -i '${self.ipv4_addresses[1][0]},' playbooks/postgres.yaml"
+  # }
 }

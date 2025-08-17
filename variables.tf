@@ -9,3 +9,7 @@ variable "password" {
 variable "username" {
   type = string
 }
+
+variable "pihole_password" {
+  type = string
+}

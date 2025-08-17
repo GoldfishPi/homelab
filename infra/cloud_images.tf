@@ -1,4 +1,4 @@
-resource "proxmox_virtual_environment_download_file" "ubuntu_cloud_image" {
+resource "proxmox_virtual_environment_download_file" "debian_cloud_image" {
   content_type = "import"
   datastore_id = "local"
   node_name    = "node1"

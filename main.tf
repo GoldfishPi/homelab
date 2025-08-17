@@ -2,13 +2,10 @@ module "infrastructure" {
   source = "./infra/"
   providers = {
     proxmox = proxmox
+    pihole = pihole
   }
 }
 
-output "test" {
-  value = module.infrastructure.test_debian_ipv4
-}
-
 output "postgres" {
-  value = module.infrastructure.postgres_ipv4
+  value = module.infrastructure.postgres_local
 }
