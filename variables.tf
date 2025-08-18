@@ -13,3 +13,7 @@ variable "username" {
 variable "pihole_password" {
   type = string
 }
+
+variable "cloudflare_token" {
+  type = string
+}
