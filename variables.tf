@@ -17,3 +17,10 @@ variable "pihole_password" {
 variable "cloudflare_token" {
   type = string
 }
+
+variable "pm_username" {
+  type = string
+}
+variable "pm_password" {
+  type = string
+}

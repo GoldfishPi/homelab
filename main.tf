@@ -3,6 +3,7 @@ module "infrastructure" {
   providers = {
     proxmox = proxmox
     pihole = pihole
+    # npm = npm
   }
 }
 
