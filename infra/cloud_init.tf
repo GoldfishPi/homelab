@@ -15,9 +15,19 @@ resource "proxmox_virtual_environment_file" "cloud_config" {
           - sudo
         shell: /bin/bash
         sudo: ALL=(ALL) NOPASSWD:ALL
+
+    package_update: true
+    package_upgrade: true
+
+    packages:
+      - qemu-guest-agent
+      - net-tools
+
+
+    bootcmd:
+      - /bin/bash -c "until ping -c1 8.8.8.8; do sleep 2; done"
+
     runcmd:
-        - apt update
-        - apt install -y qemu-guest-agent net-tools
         - systemctl enable qemu-guest-agent
         - systemctl start qemu-guest-agent
         - echo "done" > /tmp/cloud-config.done
