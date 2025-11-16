@@ -1,7 +1,8 @@
 resource "proxmox_virtual_environment_vm" "jumpbox" {
+  vm_id = 2000
   name      = "jumpbox"
   node_name = "node1"
-  tags = ["ks"]
+  tags = ["k8s"]
 
   # should be true if qemu agent is not installed / enabled on the VM
   stop_on_destroy = false
@@ -55,9 +56,10 @@ resource "openwrt_dhcp_domain" "jumpbox" {
 }
 
 resource "proxmox_virtual_environment_vm" "server" {
+  vm_id = 2001
   name      = "server"
   node_name = "node1"
-  tags = ["ks"]
+  tags = ["k8s"]
 
   # should be true if qemu agent is not installed / enabled on the VM
   stop_on_destroy = false
@@ -111,9 +113,10 @@ resource "openwrt_dhcp_domain" "server" {
 }
 
 resource "proxmox_virtual_environment_vm" "node-0" {
+  vm_id = 2002
   name      = "node-0"
   node_name = "node1"
-  tags = ["ks"]
+  tags = ["k8s"]
 
   # should be true if qemu agent is not installed / enabled on the VM
   stop_on_destroy = false
@@ -167,9 +170,10 @@ resource "openwrt_dhcp_domain" "node-0" {
 }
 
 resource "proxmox_virtual_environment_vm" "node-1" {
+  vm_id = 2003
   name      = "node-1"
   node_name = "node1"
-  tags = ["ks"]
+  tags = ["k8s"]
 
   # should be true if qemu agent is not installed / enabled on the VM
   stop_on_destroy = false
