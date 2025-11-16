@@ -46,3 +46,9 @@ resource "proxmox_virtual_environment_vm" "tailscale" {
     device = "socket"
   }
 }
+
+resource "openwrt_dhcp_domain" "tailscale" {
+  id   = "tailscale"
+  ip   = proxmox_virtual_environment_vm.tailscale.ipv4_addresses[1][0]
+  name = "tailscale.local"
+}

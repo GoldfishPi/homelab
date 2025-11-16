@@ -24,3 +24,7 @@ variable "pm_username" {
 variable "pm_password" {
   type = string
 }
+
+variable "openwrt_password" {
+  type = string
+}

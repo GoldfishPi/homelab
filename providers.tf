@@ -5,10 +5,10 @@ terraform {
       source = "bpg/proxmox"
       version = ">= 0.86.0"
     }
-    # pihole = {
-    #   source  = "registry.terraform.io/lukaspustina/pihole"
-    #   version = "0.3.0"
-    # }
+    openwrt = {
+      source = "joneshf/openwrt"
+      version = "0.0.20"
+    }
     nginxproxymanager = {
       source = "Sander0542/nginxproxymanager"
       version = "1.2.2"
@@ -33,21 +33,10 @@ provider "nginxproxymanager" {
   password = var.pm_password
 }
 
-# provider "pihole" {
-#   url      = "http://pihole.local" # PIHOLE_URL
-#   password = var.pihole_password
-# }
-
 provider "cloudflare" {
   api_token = var.cloudflare_token
 }
 
-# resource "cloudflare_dns_record" "test" {
-#   zone_id = "3832536fbbd4c141a963a3fd3f620f99"
-#   name = "test.erikbadger.com"
-#   ttl = 120
-#   type = "A"
-#   comment = "test record"
-#   content = "192.168.0.17"
-#   proxied = false
-# }
+provider "openwrt" {
+  password = var.openwrt_password
+}

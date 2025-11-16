@@ -1,7 +1,7 @@
 resource "proxmox_virtual_environment_vm" "jumpbox" {
   name      = "jumpbox"
   node_name = "node1"
-  tags = ["k8s"]
+  tags = ["ks"]
 
   # should be true if qemu agent is not installed / enabled on the VM
   stop_on_destroy = false
@@ -46,12 +46,18 @@ resource "proxmox_virtual_environment_vm" "jumpbox" {
   serial_device {
     device = "socket"
   }
+}
+
+resource "openwrt_dhcp_domain" "jumpbox" {
+  id   = "jumpbox"
+  ip   = proxmox_virtual_environment_vm.jumpbox.ipv4_addresses[1][0]
+  name = "jumpbox.ks.local"
 }
 
 resource "proxmox_virtual_environment_vm" "server" {
   name      = "server"
   node_name = "node1"
-  tags = ["k8s"]
+  tags = ["ks"]
 
   # should be true if qemu agent is not installed / enabled on the VM
   stop_on_destroy = false
@@ -96,12 +102,18 @@ resource "proxmox_virtual_environment_vm" "server" {
   serial_device {
     device = "socket"
   }
+}
+
+resource "openwrt_dhcp_domain" "server" {
+  id   = "server"
+  ip   = proxmox_virtual_environment_vm.server.ipv4_addresses[1][0]
+  name = "server.ks.local"
 }
 
 resource "proxmox_virtual_environment_vm" "node-0" {
   name      = "node-0"
   node_name = "node1"
-  tags = ["k8s"]
+  tags = ["ks"]
 
   # should be true if qemu agent is not installed / enabled on the VM
   stop_on_destroy = false
@@ -148,10 +160,16 @@ resource "proxmox_virtual_environment_vm" "node-0" {
   }
 }
 
+resource "openwrt_dhcp_domain" "node-0" {
+  id   = "node0"
+  ip   = proxmox_virtual_environment_vm.node-0.ipv4_addresses[1][0]
+  name = "node0.ks.local"
+}
+
 resource "proxmox_virtual_environment_vm" "node-1" {
   name      = "node-1"
   node_name = "node1"
-  tags = ["k8s"]
+  tags = ["ks"]
 
   # should be true if qemu agent is not installed / enabled on the VM
   stop_on_destroy = false
@@ -196,4 +214,10 @@ resource "proxmox_virtual_environment_vm" "node-1" {
   serial_device {
     device = "socket"
   }
+}
+
+resource "openwrt_dhcp_domain" "node-1" {
+  id   = "node1"
+  ip   = proxmox_virtual_environment_vm.node-1.ipv4_addresses[1][0]
+  name = "node1.ks.local"
 }

@@ -4,9 +4,9 @@ terraform {
     proxmox = {
       source = "bpg/proxmox"
     }
-    # pihole = {
-    #   source  = "registry.terraform.io/lukaspustina/pihole"
-    #   version = "0.3.0"
-    # }
+    openwrt = {
+      source = "joneshf/openwrt"
+      version = "0.0.20"
+    }
   }
 }
