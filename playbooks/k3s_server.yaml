@@ -1,0 +1,26 @@
+- name: K3s
+  hosts: all
+  become: yes
+  tasks:
+
+    - name: Update
+      apt: state=latest force_apt_get=yes
+
+    - name: Install k3s
+      shell: |
+        curl -sfL https://get.k3s.io | \
+        INSTALL_K3S_EXEC="server \
+                          --write-kubeconfig-mode 644 \
+                          --node-ip {{host_ip}} \
+                          --advertise-address {{host_ip}}" \
+        sh -
+      args:
+        creates: /usr/local/bin/k3s
+
+    - name: Read token
+      shell: sudo cat /var/lib/rancher/k3s/server/node-token
+      register: token_result
+
+    - name: Print token in machine readable format
+      debug:
+        msg: "K3S_SERVER_NODE_TOKEN={{token_result.stdout}}"
