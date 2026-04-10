@@ -6,7 +6,7 @@ resource "proxmox_virtual_environment_vm" "k3s_server" {
   vm_id = 3000
   name      = "server.k3s.homelab.lan"
   node_name = "node1"
-  tags = ["k3s", "2GB"]
+  tags = ["k3s", "4GB", "server"]
 
   # should be true if qemu agent is not installed / enabled on the VM
   stop_on_destroy = false
@@ -129,9 +129,9 @@ output "k8s_server_ip" {
 resource "proxmox_virtual_environment_vm" "k3s_nodes" {
   count = 3
   vm_id = 3001 + count.index
-  name      = "agent${count.index + 1}.k3s.homelab.lan"
+  name      = "node${count.index + 1}.k3s.homelab.lan"
   node_name = "node1"
-  tags = ["k3s", "2GB"]
+  tags = ["k3s", "4GB", "node"]
 
   # should be true if qemu agent is not installed / enabled on the VM
   stop_on_destroy = false
@@ -199,4 +199,14 @@ resource "ansible_playbook" "configure_k3s_nodes" {
     proxmox_virtual_environment_vm.k3s_server,
     proxmox_virtual_environment_vm.k3s_nodes
   ]
+}
+
+resource "openwrt_dhcp_domain" "k3s_nodes" {
+  for_each = {
+    for idx, vm in proxmox_virtual_environment_vm.k3s_nodes :
+    idx => vm
+  }
+  id   = each.value.id
+  ip   = each.value.ipv4_addresses[1][0]
+  name = each.value.name
 }
