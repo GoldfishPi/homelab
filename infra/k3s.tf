@@ -201,6 +201,21 @@ resource "ansible_playbook" "configure_k3s_nodes" {
   ]
 }
 
+resource "ansible_playbook" "nfs" {
+  for_each = {
+    for idx, vm in proxmox_virtual_environment_vm.k3s_nodes :
+    idx => vm
+  }
+  playbook   = "${path.module}/playbooks/nfs.yaml"
+  name       = each.value.ipv4_addresses[1][0]
+  replayable = false
+
+  extra_vars = {
+    ansible_user                 = "erik"
+    ansible_ssh_private_key_file = "~/.ssh/id_rsa"
+  }
+}
+
 resource "openwrt_dhcp_domain" "k3s_nodes" {
   for_each = {
     for idx, vm in proxmox_virtual_environment_vm.k3s_nodes :
