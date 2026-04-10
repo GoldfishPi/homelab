@@ -22,17 +22,37 @@ resource "kubernetes_namespace" "immich" {
   }
 }
 
+resource "kubernetes_persistent_volume_v1" "immich_data" {
+  metadata {
+    name = "nfs-pv"
+  }
+  spec {
+    capacity = {
+      storage = "250Gi"
+    }
+    access_modes = ["ReadWriteMany"]
+    storage_class_name = "nfs"
+    persistent_volume_reclaim_policy = "Retain"
+    persistent_volume_source {
+      nfs {
+        server = "truenas.lan"
+        path = "/mnt/pool/k8s/immich"
+      }
+    }
+  }
+}
+
 resource "kubernetes_persistent_volume_claim" "immich_data" {
   metadata {
     name = "immich-library-pvc"
     namespace = kubernetes_namespace.immich.metadata[0].name
   }
   spec {
-    storage_class_name = "local-path"
-    access_modes = ["ReadWriteOnce"]
+    storage_class_name = "nfs"
+    access_modes = ["ReadWriteMany"]
     resources {
       requests = {
-        storage = "5Gi"
+        storage = "250Gi"
       }
     }
   }
