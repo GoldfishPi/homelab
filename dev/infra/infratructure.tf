@@ -37,10 +37,6 @@ variable "server_memory" {
   default = 4096
 }
 
-data "local_file" "ssh_public_key" {
-  filename = "~/.ssh/id_rsa.pub"
-}
-
 
 resource "proxmox_download_file" "debian_cloud_image" {
   content_type       = "import"
@@ -62,7 +58,7 @@ resource "proxmox_virtual_environment_file" "cloud_config" {
       - default
       - name: erik
         ssh_authorized_keys:
-          - ${trimspace(data.local_file.ssh_public_key.content)}
+          - ${trimspace(file("~/.ssh/id_rsa"))}
         groups:
           - sudo
         shell: /bin/bash

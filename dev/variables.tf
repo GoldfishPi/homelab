@@ -28,3 +28,15 @@ variable "pm_password" {
 variable "openwrt_password" {
   type = string
 }
+
+variable "id_start" {
+  type = number
+}
+
+variable "node" {
+  type = string
+}
+
+variable "namespace" {
+  type = string
+}
