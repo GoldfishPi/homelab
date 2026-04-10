@@ -43,8 +43,24 @@ provider "cloudflare" {
 provider "openwrt" {
   password = var.openwrt_password
 }
-module "infrastructure" {
+
+module "dev" {
   source = "./infra/"
+  id_start = 3000
+  namespace = "dev.homelab.lan"
+  node = "node3"
+  providers = {
+    proxmox = proxmox
+    openwrt = openwrt
+  }
+}
+
+module "prod" {
+  source = "./infra/"
+  id_start = 4000
+  namespace = "prod.homelab.lan"
+  node = "node1"
+  worker_memory = 8192
   providers = {
     proxmox = proxmox
     openwrt = openwrt
@@ -53,32 +69,32 @@ module "infrastructure" {
 
 
 provider "kubernetes" {
-  host = "https://${module.infrastructure.k8s_server_ip}:6443"
-  client_key = base64decode(module.infrastructure.k8s_client_key)
-  cluster_ca_certificate = base64decode(module.infrastructure.k8s_ca_certificate)
-  client_certificate = base64decode(module.infrastructure.k8s_client_certificate)
+  host = "https://${module.dev.k8s_server_ip}:6443"
+  client_key = base64decode(module.dev.k8s_client_key)
+  cluster_ca_certificate = base64decode(module.dev.k8s_ca_certificate)
+  client_certificate = base64decode(module.dev.k8s_client_certificate)
 }
 
 provider "helm" {
   kubernetes = {
-    host = "https://${module.infrastructure.k8s_server_ip}:6443"
-    client_key = base64decode(module.infrastructure.k8s_client_key)
-    cluster_ca_certificate = base64decode(module.infrastructure.k8s_ca_certificate)
-    client_certificate = base64decode(module.infrastructure.k8s_client_certificate)
+    host = "https://${module.dev.k8s_server_ip}:6443"
+    client_key = base64decode(module.dev.k8s_client_key)
+    cluster_ca_certificate = base64decode(module.dev.k8s_ca_certificate)
+    client_certificate = base64decode(module.dev.k8s_client_certificate)
   }
 }
 
 provider "kubectl" {
-  host = "https://${module.infrastructure.k8s_server_ip}:6443"
-  client_key = base64decode(module.infrastructure.k8s_client_key)
-  cluster_ca_certificate = base64decode(module.infrastructure.k8s_ca_certificate)
-  client_certificate = base64decode(module.infrastructure.k8s_client_certificate)
+  host = "https://${module.dev.k8s_server_ip}:6443"
+  client_key = base64decode(module.dev.k8s_client_key)
+  cluster_ca_certificate = base64decode(module.dev.k8s_ca_certificate)
+  client_certificate = base64decode(module.dev.k8s_client_certificate)
   load_config_file       = false
 }
 
 module "applications" {
   source = "./applications/"
-  host = module.infrastructure.k8s_server_ip
+  host = module.dev.k8s_server_ip
   providers = {
     openwrt = openwrt
     kubernetes = kubernetes

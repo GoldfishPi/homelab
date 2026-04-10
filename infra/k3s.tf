@@ -1,12 +1,8 @@
-locals {
-  memory = 4096
-}
-
 resource "proxmox_virtual_environment_vm" "k3s_server" {
-  vm_id = 3000
-  name      = "server.k3s.homelab.lan"
-  node_name = "node1"
-  tags = ["k3s", "4GB", "server"]
+  vm_id = var.id_start
+  name      = "server.k3s.${var.namespace}"
+  node_name = var.node
+  tags = ["k3s","server"]
 
   # should be true if qemu agent is not installed / enabled on the VM
   stop_on_destroy = false
@@ -16,7 +12,7 @@ resource "proxmox_virtual_environment_vm" "k3s_server" {
   }
 
   memory {
-    dedicated = local.memory
+    dedicated = var.server_memory
   }
 
   operating_system {
@@ -38,7 +34,7 @@ resource "proxmox_virtual_environment_vm" "k3s_server" {
 
   disk {
     datastore_id = "local-lvm"
-    import_from  = proxmox_virtual_environment_download_file.debian_cloud_image.id
+    import_from  = proxmox_download_file.debian_cloud_image.id
     interface    = "virtio0"
     iothread     = true
     discard      = "on"
@@ -84,9 +80,9 @@ resource "ansible_playbook" "server_kubeconfig" {
 }
 
 resource "openwrt_dhcp_domain" "k3s_server" {
-  id   = "k3s_server"
+  id   = proxmox_virtual_environment_vm.k3s_server.id
   ip   = proxmox_virtual_environment_vm.k3s_server.ipv4_addresses[1][0]
-  name = "server.k3s.homelab.lan"
+  name = proxmox_virtual_environment_vm.k3s_server.name
 }
 
 locals {
@@ -128,10 +124,10 @@ output "k8s_server_ip" {
 
 resource "proxmox_virtual_environment_vm" "k3s_nodes" {
   count = 3
-  vm_id = 3001 + count.index
-  name      = "node${count.index + 1}.k3s.homelab.lan"
-  node_name = "node1"
-  tags = ["k3s", "4GB", "node"]
+  vm_id = proxmox_virtual_environment_vm.k3s_server.vm_id + 1 + count.index
+  name      = "node${count.index + 1}.k3s.${var.namespace}"
+  node_name = var.node
+  tags = ["k3s","node"]
 
   # should be true if qemu agent is not installed / enabled on the VM
   stop_on_destroy = false
@@ -141,7 +137,7 @@ resource "proxmox_virtual_environment_vm" "k3s_nodes" {
   }
 
   memory {
-    dedicated = local.memory
+    dedicated = var.worker_memory
   }
 
   operating_system {
@@ -163,7 +159,7 @@ resource "proxmox_virtual_environment_vm" "k3s_nodes" {
 
   disk {
     datastore_id = "local-lvm"
-    import_from  = proxmox_virtual_environment_download_file.debian_cloud_image.id
+    import_from  = proxmox_download_file.debian_cloud_image.id
     interface    = "virtio0"
     iothread     = true
     discard      = "on"
