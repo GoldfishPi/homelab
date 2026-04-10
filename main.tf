@@ -68,37 +68,13 @@ module "prod" {
 }
 
 
-provider "kubernetes" {
-  host = "https://${module.dev.k8s_server_ip}:6443"
-  client_key = base64decode(module.dev.k8s_client_key)
-  cluster_ca_certificate = base64decode(module.dev.k8s_ca_certificate)
-  client_certificate = base64decode(module.dev.k8s_client_certificate)
-}
-
-provider "helm" {
-  kubernetes = {
-    host = "https://${module.dev.k8s_server_ip}:6443"
-    client_key = base64decode(module.dev.k8s_client_key)
-    cluster_ca_certificate = base64decode(module.dev.k8s_ca_certificate)
-    client_certificate = base64decode(module.dev.k8s_client_certificate)
-  }
-}
-
-provider "kubectl" {
-  host = "https://${module.dev.k8s_server_ip}:6443"
-  client_key = base64decode(module.dev.k8s_client_key)
-  cluster_ca_certificate = base64decode(module.dev.k8s_ca_certificate)
-  client_certificate = base64decode(module.dev.k8s_client_certificate)
-  load_config_file       = false
-}
-
 module "applications" {
   source = "./applications/"
   host = module.dev.k8s_server_ip
+  client_key = base64decode(module.dev.k8s_client_key)
+  cluster_ca_certificate = base64decode(module.dev.k8s_ca_certificate)
+  client_certificate = base64decode(module.dev.k8s_client_certificate)
   providers = {
     openwrt = openwrt
-    kubernetes = kubernetes
-    kubectl = kubectl
-    helm = helm
   }
 }
