@@ -1,3 +1,7 @@
+locals {
+  memory = 4096
+}
+
 resource "proxmox_virtual_environment_vm" "k3s_server" {
   vm_id = 3000
   name      = "server.k3s.homelab.lan"
@@ -12,7 +16,7 @@ resource "proxmox_virtual_environment_vm" "k3s_server" {
   }
 
   memory {
-    dedicated = 2048
+    dedicated = local.memory
   }
 
   operating_system {
@@ -64,6 +68,21 @@ resource "ansible_playbook" "configure_k3s_server" {
 
 }
 
+resource "ansible_playbook" "server_kubeconfig" {
+  playbook   = "${path.module}/playbooks/read_server_kubeconfig.yaml"
+  name       = proxmox_virtual_environment_vm.k3s_server.ipv4_addresses[1][0]
+  replayable = false
+
+  extra_vars = {
+    ansible_user                 = "erik"
+    ansible_ssh_private_key_file = "~/.ssh/id_rsa"
+    host_ip       = proxmox_virtual_environment_vm.k3s_server.ipv4_addresses[1][0]
+  }
+
+  depends_on = [proxmox_virtual_environment_vm.k3s_server]
+
+}
+
 resource "openwrt_dhcp_domain" "k3s_server" {
   id   = "k3s_server"
   ip   = proxmox_virtual_environment_vm.k3s_server.ipv4_addresses[1][0]
@@ -81,6 +100,32 @@ output "k3s_token" {
   value = local.token
 }
 
+output "k8s_ca_certificate" {
+  value = regex(
+    "TF_K8S_CLUSTER_CA_CERTIFICATE=(.+)\"",
+    ansible_playbook.server_kubeconfig.ansible_playbook_stdout
+  )[0]
+}
+
+output "k8s_client_certificate" {
+  value = regex(
+    "TF_K8S_CLIENT_CERTIFICATE=(.+)\"",
+    ansible_playbook.server_kubeconfig.ansible_playbook_stdout
+  )[0]
+
+}
+
+output "k8s_client_key" {
+  value = regex(
+    "TF_K8S_CLIENT_KEY=(.+)\"",
+    ansible_playbook.server_kubeconfig.ansible_playbook_stdout
+  )[0]
+}
+
+output "k8s_server_ip" {
+  value = proxmox_virtual_environment_vm.k3s_server.ipv4_addresses[1][0]
+}
+
 resource "proxmox_virtual_environment_vm" "k3s_nodes" {
   count = 3
   vm_id = 3001 + count.index
@@ -96,7 +141,7 @@ resource "proxmox_virtual_environment_vm" "k3s_nodes" {
   }
 
   memory {
-    dedicated = 2048
+    dedicated = local.memory
   }
 
   operating_system {
@@ -133,21 +178,13 @@ resource "proxmox_virtual_environment_vm" "k3s_nodes" {
   }
 }
 
-locals {
-  k3s_ip_list = [
-    for vm in proxmox_virtual_environment_vm.k3s_nodes :
-    vm.ipv4_addresses[1][0]
-  ]
-}
-
-output "ips" {
-  value = local.k3s_ip_list
-}
-
 resource "ansible_playbook" "configure_k3s_nodes" {
-  for_each = toset(local.k3s_ip_list)
+  for_each = {
+    for idx, vm in proxmox_virtual_environment_vm.k3s_nodes :
+    idx => vm
+  }
   playbook   = "playbooks/k3s_agent.yaml"
-  name       = each.value
+  name       = each.value.ipv4_addresses[1][0]
   replayable = false
 
   extra_vars = {
@@ -155,7 +192,7 @@ resource "ansible_playbook" "configure_k3s_nodes" {
     ansible_ssh_private_key_file = "~/.ssh/id_rsa"
     k3s_url = openwrt_dhcp_domain.k3s_server.name
     k3s_token = local.token
-    node_name = each.value
+    node_name = each.value.name
   }
 
   depends_on = [
