@@ -79,7 +79,7 @@ resource "ansible_playbook" "server_kubeconfig" {
     host_ip       = proxmox_virtual_environment_vm.k3s_server.ipv4_addresses[1][0]
   }
 
-  depends_on = [proxmox_virtual_environment_vm.k3s_server]
+  depends_on = [proxmox_virtual_environment_vm.k3s_server, ansible_playbook.configure_k3s_server]
 
 }
 

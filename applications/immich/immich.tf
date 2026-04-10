@@ -58,6 +58,7 @@ resource "kubectl_manifest" "cnpg" {
 
 resource "kubectl_manifest" "cnpg_cluster" {
   yaml_body = file("${path.module}/postgres.yaml")
+  depends_on = [kubectl_manifest.cnpg]
 }
 
 resource "helm_release" "immich" {
@@ -69,6 +70,7 @@ resource "helm_release" "immich" {
   values = [
     file("${path.module}/values.yaml")
   ]
+  depends_on = [kubectl_manifest.cnpg_cluster]
 }
 
 resource "kubectl_manifest" "ingress" {
