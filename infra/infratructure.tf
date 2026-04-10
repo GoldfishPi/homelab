@@ -38,7 +38,7 @@ variable "server_memory" {
 }
 
 data "local_file" "ssh_public_key" {
-  filename = "id_rsa.pub"
+  filename = "~/.ssh/id_rsa.pub"
 }
 
 
