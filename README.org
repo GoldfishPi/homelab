@@ -1,0 +1,16 @@
+* Homelab
+  A set of configuration files and services I deploy to my home server.
+** Run order
+   #+begin_src
+   proxmox -> provisioning -> services
+   #+end_src
+** Projects
+*** proxmox 
+    This terraform project configures base infrastructure across my proxmox cluster.
+*** services
+    This this project deploys kubernetes services to the k3s cluster created in the `provisioning` step
+** Environments
+   My homelab supports two environments currently, `dev` and `prod`. I don't currently have mirrored server hardware so the `proxmox` project operates on all hardware nodes. 
+   The pattern I follow is to configure environments via folder structure where each project has a `dev/` and a `prod/` terraform project under it which needs to be run separately. At work we use branches to control environments, I was curious if this wold be easier to fallow.
+** Tasks
+*** TODO create better place for saving environment variables
