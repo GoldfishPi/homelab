@@ -6,6 +6,10 @@
     - name: Update
       apt: state=latest force_apt_get=yes
 
+    - name: NFS utils
+      apt:
+        name: nfs-common
+
     - name: Install k3s
       shell: |
         curl -sfL https://get.k3s.io | \
@@ -16,6 +20,11 @@
         sh -
       args:
         creates: /usr/local/bin/k3s
+
+    - name: Install helm
+      shell: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+      args:
+        creates: /usr/local/bin/helm
 
     - name: Read token
       shell: sudo cat /var/lib/rancher/k3s/server/node-token

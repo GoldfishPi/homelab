@@ -49,7 +49,7 @@ module "cluster" {
   source = "./infra/"
   id_start = var.id_start
   namespace = var.namespace
-  node =var.node
+  node = var.node
   providers = {
     proxmox = proxmox
     openwrt = openwrt

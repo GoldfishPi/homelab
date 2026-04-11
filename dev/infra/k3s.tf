@@ -52,7 +52,7 @@ resource "proxmox_virtual_environment_vm" "k3s_server" {
 resource "ansible_playbook" "configure_k3s_server" {
   playbook   = "${path.module}/playbooks/k3s_server.yaml"
   name       = proxmox_virtual_environment_vm.k3s_server.ipv4_addresses[1][0]
-  replayable = false
+  replayable = true
 
   extra_vars = {
     ansible_user                 = "erik"
@@ -181,7 +181,7 @@ resource "ansible_playbook" "configure_k3s_nodes" {
   }
   playbook   = "${path.module}/playbooks/k3s_node.yaml"
   name       = each.value.ipv4_addresses[1][0]
-  replayable = false
+  replayable = true
 
   extra_vars = {
     ansible_user                 = "erik"

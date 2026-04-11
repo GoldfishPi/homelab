@@ -6,6 +6,10 @@
     - name: Update
       apt: state=latest force_apt_get=yes
 
+    - name: NFS utils
+      apt:
+        name: nfs-common
+
     - name: Install k3s
       shell: |
         curl -sfL https://get.k3s.io | \

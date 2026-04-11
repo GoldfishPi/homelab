@@ -90,7 +90,7 @@ resource "helm_release" "immich" {
   values = [
     file("${path.module}/values.yaml")
   ]
-  depends_on = [kubectl_manifest.cnpg_cluster]
+  depends_on = [kubectl_manifest.cnpg_cluster, kubernetes_persistent_volume_v1.immich_data]
 }
 
 resource "kubectl_manifest" "ingress" {

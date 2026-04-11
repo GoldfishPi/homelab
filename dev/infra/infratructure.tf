@@ -58,7 +58,7 @@ resource "proxmox_virtual_environment_file" "cloud_config" {
       - default
       - name: erik
         ssh_authorized_keys:
-          - ${trimspace(file("~/.ssh/id_rsa"))}
+          - ${trimspace(file("~/.ssh/id_rsa.pub"))}
         groups:
           - sudo
         shell: /bin/bash
