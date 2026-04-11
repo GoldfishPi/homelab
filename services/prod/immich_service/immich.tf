@@ -102,7 +102,7 @@ resource "helm_release" "immich" {
 }
 
 resource "openwrt_dhcp_domain" "immich" {
-  id   = "immich"
+  id   = replace("immich.${var.namespace}", ".", "_")
   ip   = var.host
   name = "immich.${var.namespace}"
 }
