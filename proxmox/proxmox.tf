@@ -83,6 +83,7 @@ resource "proxmox_virtual_environment_file" "cloud_config" {
   }
 }
 
+
 output "cloud_config_id" {
   value = proxmox_virtual_environment_file.cloud_config.id
 }
