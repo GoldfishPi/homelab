@@ -7,6 +7,8 @@
 ** Projects
 *** proxmox 
     This terraform project configures base infrastructure across my proxmox cluster.
+*** provisioning
+    Provisions and configures vms on the proxmox cluster.
 *** services
     This this project deploys kubernetes services to the k3s cluster created in the `provisioning` step
 ** Environments
